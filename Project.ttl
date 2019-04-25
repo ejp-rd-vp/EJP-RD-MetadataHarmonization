@@ -1,0 +1,36 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ldp:	<http://www.w3.org/ns/ldp#> .
+@prefix ns2:	<http://www.w3.org/ns/prov#> .
+@prefix ns3:	<http://purl.org/dc/dcmitype/> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf:	<http://xmlns.com/foaf/0.1/> .
+@prefix ns6:	<http://www.w3.org/ns/dcat#> .
+@prefix ns7:	<http://purl.org/dc/terms/> .
+@prefix ns8:	<http://lexvo.org/id/iso639-3/> .
+@prefix ns9:	<http://purl.org/pav/> .
+@prefix ns10:	<http://www.ksl.stanford.edu/projects/DAML/ksl-daml-desc.daml#> .
+
+<http://training.fairdata.solutions/DAV/home/LDP_EJP/>
+	rdf:type	ldp:BasicContainer , ldp:Container , ns2:Collection , ns3:Dataset ;
+	rdfs:label	"European Joint Programe on Rare Diseases FAIR Accessor"@en ;
+	foaf:primaryTopic	<http://www.ejprarediseases.org/> ;
+	ldp:contains	<http://training.fairdata.solutions/DAV/home/LDP_EJP/CatalogueOfRegistries/> ;
+	ns6:landingPage	<http://www.ejprarediseases.org/> ;
+	ns6:theme	<https://training.fairdata.solutions/DAV/home/ConceptSchemes/EJP_ProjectLayer_concept_scheme.ttl> ;
+	ns7:issued	"2019-04-08"@en ;
+	ns7:language	ns8:eng ;
+	ns7:license	<http://purl.org/NET/rdflicense/cc-by-nd4.0> ;
+	ns9:authoredBy	<http://orcid.org/0000-0002-9699-485X> ;
+	ns10:has-Principle-Investigator	"Dr. Daria JULKOWSKA"@en ;
+	ns6:contactPoint	<http://biordf.org/DataFairPort/MiscRDF/Wilkinson.rdf> ;
+	ns6:description	"A 'strawman' prototype of a multi-layered metadata structure enabling mechanized exploration of the EJP resources."@en ;
+	ns6:identifier	<https://training.fairdata.solutions/DAV/home/LDP_EJP/> ;
+	ns6:keyword	"Biobank"@en , "Rare Diseases"@en , "Registries"@en , "Registry"@en , "Biobanks"@en , "EJP RD"@en , "European Joint Programme on Rare Diseases"@en , "FAIR Accessor"@en ;
+	ns6:publisher	<http://www.ejprarediseases.org/> ;
+	ns7:creator	<http://www.ejprarediseases.org/> ;
+	foaf:page	<http://www.ejprarediseases.org/> , <https://training.fairdata.solutions/sparql/> ;
+	ns7:title	"European Joint Programe on Rare Diseases FAIR Accessor"@en .
+<http://training.fairdata.solutions/DAV/home/LDP_EJP/CatalogueOfRegistries/>
+	rdf:type	ldp:BasicContainer , ldp:Container , ns2:Collection , ns3:Dataset .
+<http://training.fairdata.solutions/DAV/home/LDP_EJP/test/>
+	rdf:type	ldp:BasicContainer , ldp:Container .

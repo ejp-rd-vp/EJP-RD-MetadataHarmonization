@@ -1,0 +1,37 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ldp:	<http://www.w3.org/ns/ldp#> .
+@prefix ns2:	<http://www.w3.org/ns/prov#> .
+@prefix ns3:	<http://purl.org/dc/dcmitype/> .
+@prefix ns4:	<http://purl.obolibrary.org/obo/> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf:	<http://xmlns.com/foaf/0.1/> .
+@prefix ns7:	<http://www.w3.org/ns/dcat#> .
+@prefix ns8:	<http://catalogue.rd-connect.eu/web/american-partnership-for-eosinophilic-disorders/> .
+@prefix ns9:	<http://purl.org/dc/terms/> .
+@prefix ns10:	<http://lexvo.org/id/iso639-3/> .
+@prefix ns11:	<http://purl.org/pav/> .
+@prefix ns12:	<http://dbpedia.org/ontology/> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix void:	<http://rdfs.org/ns/void#> .
+@prefix ns15:	<http://catalogue.rd-connect.eu/web/guest/> .
+
+<http://training.fairdata.solutions/DAV/home/LDP_EJP/CatalogueOfRegistries/REGISTRY3/>
+	rdf:type	ldp:BasicContainer , ldp:Container , ns2:Collection , ns3:Dataset , ns4:ERO_0001843 ;
+	rdfs:label	"American Partnership for Eosinophilic Disorders"@en ;
+	foaf:primaryTopic	<http://catalogue.rd-connect.eu/> ;
+	ns7:landingPage	ns8:reg_home ;
+	ns7:theme	<https://training.fairdata.solutions/DAV/home/ConceptSchemes/EJP_REGISTRY3_concept_scheme.ttl> ;
+	ns9:issued	"2019-04-08"@en ;
+	ns9:language	ns10:eng ;
+	ns9:license	<http://purl.org/NET/rdflicense/cc-by-nd4.0> ;
+	ns11:authoredBy	<http://orcid.org/0000-0002-9699-485X> ;
+	ns7:contactPoint	"mjstrobel@apfed.org"@en ;
+	ns7:description	"A 'strawman' prototype of a Biobank or Registry Metadata Record."@en ;
+	ns7:identifier	<https://training.fairdata.solutions/DAV/home/LDP_EJP/CatalogueOfRegistries/REGISTRY3/> ;
+	ns7:keyword	"Biobank"@en , "Rare Diseases"@en , "Registries"@en , "Registry"@en , "Biobanks"@en , "EJP RD"@en , "European Joint Programme on Rare Diseases"@en , "FAIR Accessor"@en ;
+	ns7:publisher	<http://catalogue.rd-connect.eu/> ;
+	ns12:country	"United States"@en ;
+	void:entities	"981"^^xsd:int ;
+	ns9:creator	ns15:catalogue ;
+	foaf:page	<https://training.fairdata.solutions/sparql/> , <http://catalogue.rd-connect.eu/> ;
+	ns9:title	"RD Connect Registry Metadata Record for American Partnership for Eosinophilic Disorders"@en .
