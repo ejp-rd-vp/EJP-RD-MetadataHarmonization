@@ -1,2 +1,3 @@
-# EJP-RD-MetadataHarmonization
-A place to deposit code, files, etc. related to the EJP RD sub-task of Metadata Harmonization
+# This is MarkW's strawman proposal for the high-level organization of metadata.  These three turtle files follow the Linked Data Platform "container of containers" paradigm.
+
+There's a server running at:  http://training.fairdata.solutions/DAV/home/LDP_EJP/
