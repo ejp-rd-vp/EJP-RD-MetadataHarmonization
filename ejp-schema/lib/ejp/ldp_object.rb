@@ -1,208 +1,38 @@
 require "ejp/schema/version"
 require 'sio_helper'
 
-module Ejp
-  module Schema
-    class Error < StandardError; end
+module EJP
+    class LDPServer
+      attr_accessor :server
+      
+      def initialize(params = {})
+        @server = params.fetch(:server, "http://fake.server.org/" )
+        @base = params.fetch(:server, "http://fake.server.org/" )
+        @uri = params.fetch(:server, "http://fake.server.org/" )
+      end
+      
+      def setNamespaces()
+        @rdf =  RDF::Vocabulary.new("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+        @rdfs = RDF::Vocabulary.new("http://www.w3.org/2000/01/rdf-schema#")
+        @ldp = RDF::Vocabulary.new("http://www.w3.org/ns/ldp#")
+        @sio = RDF::Vocabulary.new("http://semanticscience.org/resource/")
+        @uo =  RDF::Vocabulary.new("http://purl.obolibrary.org/obo/uo.owl#")
+        @efo = RDF::Vocabulary.new("http://www.ebi.ac.uk/efo/efo.owl#")
+        @taxon = RDF::Vocabulary.new("http://purl.obolibrary.org/obo/NCBITaxon_")
+        @rel = RDF::Vocabulary.new("http://purl.obolibrary.org/obo/RO_")
+        @obi = RDF::Vocabulary.new("http://purl.obolibrary.org/obo/OBI_")
+        @ero = RDF::Vocabulary.new("http://purl.obolibrary.org/obo/ERO_")
+        @rdc = RDF::Vocabulary.new("http://rdf.biosemantics.org/ontologies/rd-connect/rdc-meta/")
+        @ncit = RDF::Vocabulary.new("http://purl.obolibrary.org/obo/NCIT_")
+        @ordo =  RDF::Vocabulary.new("http://www.orpha.net/ORDO/")
+        @dbsnp = RDF::Vocabulary.new("https://www.ncbi.nlm.nih.gov/snp/")
+        @dcat = RDF::Vocabulary.new("http://www.w3.org/ns/dcat#")
+        @skos = RDF::Vocabulary.new("http://www.w3.org/2004/02/skos/core#")
+        @dct = RDF::Vocabulary.new("http://purl.org/dc/terms/")
+        @schema = RDF::Vocabulary.new("http://schema.org/")
+        @foaf = RDF::Vocabulary.new("http://xmlns.com/foaf/0.1/")
+      end
+      
 
-    class Catalog
-        attr_accessor :id  
-        attr_accessor :alternateName
-        attr_accessor :about
-        attr_accessor :name
-        attr_accessor :description
-        attr_accessor :homepage
-        attr_accessor :sameAs
-        attr_accessor :location
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
     end
-  
-    class Registry
-        attr_accessor :id 
-        attr_accessor :studyDesign 
-        attr_accessor :hasBioBank
-        attr_accessor :inBioBank
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-  
-    class BioBank
-        attr_accessor :id
-        attr_accessor :recruiting 
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-  
-    class StudyDesign
-        attr_accessor :id 
-        attr_accessor :inclusionExclusionCriteria
-        attr_accessor :recruitmentArea
-        attr_accessor :recruitmentStartDate
-        attr_accessor :recruitmentEndDate
-        attr_accessor :numberOfCases
-        attr_accessor :datasource
-        attr_accessor :privacyPolicy
-        attr_accessor :ethicalReviewCommittee
-        attr_accessor :availableForFutureCollaboration
-        attr_accessor :additionalProperties
-        
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-  
-    class BiologicalSample
-        attr_accessor :id  
-        attr_accessor :name
-        attr_accessor :description
-        attr_accessor :inCatalog
-        attr_accessor :characteristic
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-  
-    class Patient
-        attr_accessor :id  
-        attr_accessor :pseudonym
-        attr_accessor :diagnosis
-        attr_accessor :dateOfBirth
-        attr_accessor :sex
-        attr_accessor :status
-        attr_accessor :dateOfDeath
-        attr_accessor :firstContact
-        attr_accessor :ageAtOnset
-        attr_accessor :ageAtDiagnosis
-        attr_accessor :diagnosisOfRareDisease
-        attr_accessor :geneticDiagnosis
-        attr_accessor :undiagnosedCase
-        attr_accessor :additionalProperties
-        
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-  
-    class Code
-        attr_accessor :id  
-        attr_accessor :url
-        attr_accessor :label
-        attr_accessor :description
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-      
-    end
-    
-    class CodingSystem
-        attr_accessor :id  
-        attr_accessor :url
-        attr_accessor :label
-        attr_accessor :description
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-    
-    class PropertyValue
-        attr_accessor :id  
-        attr_accessor :name
-        attr_accessor :value
-        attr_accessor :code
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-    
-    class Organization
-        attr_accessor :id  
-        attr_accessor :name
-        attr_accessor :facility
-        attr_accessor :department
-        attr_accessor :address
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-    
-    class DateTime
-        attr_accessor :id  
-        attr_accessor :day
-        attr_accessor :month
-        attr_accessor :year
-        attr_accessor :time
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-    
-    class Location
-        attr_accessor :street  
-        attr_accessor :city
-        attr_accessor :code
-        attr_accessor :country
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-    
-    class EUPID
-        attr_accessor :id  
-        attr_accessor :eupid
-        
-        def initialize(params = {})
-          
-          @name = params.fetch(:name, 'Some Person')
-          
-        end
-    end
-  
-
-  end
 end

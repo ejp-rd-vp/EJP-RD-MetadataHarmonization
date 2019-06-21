@@ -1,12 +1,14 @@
 require "ejp/schema/version"
 require 'sio_helper'
-require 'ejp/schema/ldp_object'
+require 'ejp/ldp_object'
+require 'rdf'
+require 'rdf/turtle'
 
-module Ejp
+module EJP
   module Schema
     class Error < StandardError; end
 
-    class Catalog < LDPServer
+    class Catalog < EJP::LDPServer
         attr_accessor :id  
         attr_accessor :alternateName
         attr_accessor :about
@@ -17,10 +19,83 @@ module Ejp
         attr_accessor :location
         
         def initialize(params = {})
+          super(params)  
           
-          @name = params.fetch(:name, 'Some Person')
+          @id = params.fetch(:id, nil)
+          @alternateName  = params.fetch(:alternateName, [])
+          @about  = params.fetch(:about, [])
+          @name = params.fetch(:name, 'Unidentified Catalog')
+          @description = params.fetch(:description, 'No description provided')
+          @homepage = params.fetch(:homepage, nil)
+          @sameAs = params.fetch(:sameAs, [])
+          @location = params.fetch(:location, nil)
+          
+          @about.each do |a|
+            unless a.is_a? EJP::Schema::Code
+              @about.remove(a)
+              warn "removing #{a} because it is not an EJP::Schema::Code object"
+            end
+          end
+
+          unless @location.is_a? EJP::Schema::Location
+              warn "removing location #{@location} because it is not an EJP::Schema::Location object"
+              @location = nil
+          end
+          
+          @graph = RDF::Graph.new()
+          @helper = SioHelper::SioHelper.new
           
         end
+        
+        def add_metadata
+        
+        end
+        
+        def build()
+          self.setNamespaces()
+          #@id = params.fetch(:id, nil)
+          #@alternateName  = params.fetch(:alternateName, [])
+          #@about  = params.fetch(:about, [])
+          #@name = params.fetch(:name, 'Unidentified Catalog')
+          #@description = params.fetch(:description, 'No description provided')
+          #@homepage = params.fetch(:homepage, nil)
+          #@sameAs = params.fetch(:sameAs, [])
+          #@location = params.fetch(:location, nil)
+
+          
+          catalog = self
+          self.add_metadata([
+              [catalog.uri, @sio['has-identifier'], catalog.uri],
+              [catalog.uri, @schema.identifier, @catalog.uri],
+              [catalog.uri, @rdf.type, @dct.Catalog],
+              [catalog.uri, @rdf.type, @schema.CreativeWork],
+              [catalog.uri, @schema.name, "Mock Catalogue of EJP Registries and BioBanks"],
+              [catalog.uri, @dct.title, "Mock Catalogue of EJP Registries and BioBanks"],
+              [catalog.uri, @schema.alternateName, "Mark, Annika, Rajaram, Erik and Pablo exploring FAIR data transformation models for the EJP project"],
+              [catalog.uri, @schema.description, "We have created 4 mock patient registries - CF, Duchenne, Addison, and Adiposis - and are exploring various FAIR models for those data, based on the proposed CDEs of the EUROPEAN PLATFORM ON RARE DISEASES REGISTRATION(EU RD Platform).  We are also exploring high level metadata structures, as proposed by Simon Jupp.  These are being modelled using the Linked Data Platform as an overarching metadata schema."],
+              [catalog.uri, @dct.description, "We have created 4 mock patient registries - CF, Duchenne, Addison, and Adiposis - and are exploring various FAIR models for those data, based on the proposed CDEs of the EUROPEAN PLATFORM ON RARE DISEASES REGISTRATION(EU RD Platform).  We are also exploring high level metadata structures, as proposed by Simon Jupp.  These are being modelled using the Linked Data Platform as an overarching metadata schema."],
+              [catalog.uri, @dct.license, "CC-BY-4.0"],
+              
+               [catalog.uri, @schema.about, "#{catalog.uri}#code1"],
+                ["#{catalog.uri}#code1", @rdf.type, Code ],
+                ["#{catalog.uri}#code1", @sio['has-identifier'], 'http://umbel.org/umbel#Diseases'],
+                ["#{catalog.uri}#code1", @schema.url, 'http://umbel.org/umbel#Diseases' ],
+                ["#{catalog.uri}#code1", @rdfs.label, "Diseases" ],
+                ["#{catalog.uri}#code1", @schema.description, "Diseases are atypical or unusual or unhealthy conditions for (mostly human) living things, generally known as conditions, disorders, infections, diseases or syndromes. Diseases only affect living things and sometimes are caused by living things." ],
+              
+              [catalog.uri, @foaf.homepage, "https://github.com/LUMC-BioSemantics/ERN-common-data-elements"],  
+              [catalog.uri, @schema.creator, "#{catalog.uri}#creator"],
+                ["#{catalog.uri}#creator", @rdf.type, @schema.Organization ],
+                ["#{catalog.uri}#creator", @schema.name, "Leiden University Medical Center" ],
+                ["#{catalog.uri}#creator", @schema.address, "#{catalog.uri}#creatoraddress" ],
+                    ["#{catalog.uri}#creatoraddress", @schema.streetAddress, "S4-P/building 2, PO Box 9600" ],
+                    ["#{catalog.uri}#creatoraddress", @schema.addressCountry, "NL" ],
+                    ["#{catalog.uri}#creatoraddress", @schema.addressLocality, "Leiden" ],
+          ]) 
+  
+  
+        end
+        
       
     end
   
