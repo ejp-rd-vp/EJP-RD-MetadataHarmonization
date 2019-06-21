@@ -1,12 +1,11 @@
 require "ejp/schema/version"
 require 'sio_helper'
-require 'ejp/schema/ldp_object'
 
 module Ejp
   module Schema
     class Error < StandardError; end
 
-    class Catalog < LDPServer
+    class Catalog
         attr_accessor :id  
         attr_accessor :alternateName
         attr_accessor :about
