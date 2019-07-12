@@ -1,15 +1,39 @@
 require "ejp/schema/version"
 require 'sio_helper'
+require 'ldp_simple'
 
 module EJP
-    class LDPServer
-      attr_accessor :server
+    class LDPObject  < LDP::LDPClient
+      attr_accessor :base
+      attr_accessor :slug
+      attr_accessor :ldpserver
+      attr_accessor :username
+      attr_accessor :password
+      attr_accessor :container
       
       def initialize(params = {})
-        @server = params.fetch(:server, "http://fake.server.org/" )
-        @base = params.fetch(:server, "http://fake.server.org/" )
-        @uri = params.fetch(:server, "http://fake.server.org/" )
+        @ldpserver = params.fetch(:ldpserver, false)
+        
+        @base = params.fetch(:base, "http://fake.server.org/" )
+        @slug = params.fetch(:slug, "http://fake.server.org/" )
+        
+        if ldpserver
+          cli = LDP::LDPClient.new({
+            :endpoint => @base,
+            :username => @username,
+            :password => @password,
+          })# initialize ldp server here
+          top = cli.toplevel_container
+          @container = top.add_container(:slug => @slug) 
+        end
       end
+      
+      def uri
+        if self.ldpserver
+          super
+        end
+      end
+      
       
       def setNamespaces()
         @rdf =  RDF::Vocabulary.new("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
@@ -35,4 +59,5 @@ module EJP
       
 
     end
+      
 end
