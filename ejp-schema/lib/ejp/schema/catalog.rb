@@ -2,6 +2,7 @@
 module EJP
   module Schema
 	class Catalog 
+        attr_accessor :factory  # parent SchemaFactory
         attr_reader :uri  
         attr_accessor :alternateName # string
         attr_accessor :about # Array of Code objects
@@ -16,9 +17,14 @@ module EJP
         attr_reader :graph  # RDF::Graph
         
         def initialize(params = {})
-          #super(params)  
+          #super(params)
+		  @graph = RDF::Graph.new()
+		  @factory = params.fetch(:factory, nil)
+          abort "can't create a Catalog without a Factory" if @factory.nil?
+
           
           SioHelper::General.setNamespaces()
+
 
           @uri = params.fetch(:uri)
           abort "can't create a catalog without a URI identifier" unless @uri.to_s =~ /^\w+\:\/\//
@@ -42,10 +48,7 @@ module EJP
           @dataset = params.fetch(:dataset, [])
           
           @about.each do |a|
-            unless a.is_a? EJP::Schema::Code
-              @about.remove(a)
-              warn "removing #{a} from the list of 'about' properties because it is not an EJP::Schema::Code object"
-            end
+            self.addCode(a)
           end
 
           if !@creator.empty? & !@creator.is_a?(EJP::Schema::Organization)
@@ -60,34 +63,37 @@ module EJP
             end
           end
 
-          @graph = RDF::Graph.new()
           
           self.build
           
         end
-                
-        def add_metadata(triples)
-          helper = SioHelper::SioHelper.new
-          triples.each do |t|
-            s, p, o = t
-            helper.triplify(s,p,o,self.graph)
-          end
-        end
+
+
+
+
+		def addAbout(code)
+			unless a.is_a? EJP::Schema::Code
+			  warn "Ignoring this code (#{a.to_s}), because it is not an EJP::Schema::Code object"
+			else
+			  @factory.conceptscheme.addConcept(a)
+			end
+		end
+		
+
+
+
 
 
         def build()
-          
-          #@sameAs = params.fetch(:sameAs, [])
-          #@location = params.fetch(:location, nil)
-          #@graph
-
-          
+                    
           catalog = self
+          f = self.factory
+          g = self.graph
           
-          self.add_metadata([
+          f.add_triples(g, [
               [catalog.uri, $sio['has-identifier'], catalog.uri],
               [catalog.uri, $schema.identifier, catalog.uri],
-              [catalog.uri, $rdf.type, $dct.Catalog],
+              [catalog.uri, $rdf.type, $dcat.Catalog],
               [catalog.uri, $rdf.type, $sio.catalog],
               [catalog.uri, $rdf.type, $schema.CreativeWork],
               [catalog.uri, $rdf.type, $ejp.Catalog],
@@ -99,22 +105,21 @@ module EJP
           ])
           
           catalog.alternateName.each do |a|
-            self.add_metadata([
+            f.add_triples(g, [
               [catalog.uri, $schema.alternateName, a ]
             ])
           end
           
-          self.add_metadata([[catalog.uri, $dct.license, self.license]]) unless self.license.nil?
+          f.add_triples(g, [[catalog.uri, $dct.license, self.license]]) unless self.license.nil?
           
-          counter = 0  
-
+         
           self.about.each do |c|  # c = EJP::Schema::Code
-            c.uri #######--------------------------------------
+            f.add_triples(g, c.graph)  # merge the code graph            
           end
 
           if !@creator.empty?
             
-            self.add_metadata([            
+            f.add_triples(g, [            
                 [catalog.uri, $schema.creator, "#{catalog.uri}#creator"],
                   ["#{catalog.uri}#creator", $rdf.type, $schema.Organization ],
                   ["#{catalog.uri}#creator", $schema.name, catalog.creator.name.to_s ],
@@ -126,15 +131,15 @@ module EJP
           end
           
           
-          counter = 0  
-          self.dataset.each do |c|  # c = EJP::Schema::Registry
-            guid = c.id
-            counter +=1
-            self.add_metadata([
-                  [catalog.uri, $dcat.dataset, guid ],
-            ])
+          self.dataset.each do |d|  # d = EJP::Schema::Registry or Biobank
+            f.add_triples(g, d)
           end
 
+		  self.factory.conceptscheme.build # refresh
+		  f.add_triples(g, self.factory.conceptscheme.graph)
+		  
+		  return g  # not strictly necessary, since it's part of this object, but...
+        
         end
         
 	end
