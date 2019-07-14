@@ -8,6 +8,7 @@ module EJP
 		attr_accessor :description
 		attr_reader   :graph
 		attr_reader   :factory
+		attr_reader   :conceptscheme
 		
 		def initialize(params = {})
 		  SioHelper::General.setNamespaces()
@@ -17,21 +18,23 @@ module EJP
 		  
 		  url = params.fetch(:url, "")
 		  uri = params.fetch(:uri, "")
-		  if uri =~ /^\w+\;\/\//
-			self.uri = uri
-		  elsif url =~ /^\w+\;\/\//
-			self.uri = url
+		  if uri =~ /^\w+\:\/\//
+        self.uri = uri
+		  elsif url =~ /^\w+\:\/\//
+        self.uri = url
 		  else
 			warn "cannot create a non-named (no uri/url) code"
 			return false
 		  end
 
-		  @label = params.fetch(:label, @uri.to_s)
-		  @description = params.fetch(:desc, 'No Description Provided')
+      @conceptscheme = params.fetch(:conceptscheme, nil)
+          abort "can't create a Code without a ConceptScheme (this should never happen if you are using the schema factory)" if @conceptscheme.nil?
 
-#		  @type = [$rdf.type("http://purl.obolibrary.org/obo/NCIT_C25162"), $rdf.type('http://purl.allotrope.org/ontologies/common#AFC_0000050')]   # code
+		  @label = params.fetch(:label, @uri.to_s)
+		  @description = params.fetch(:description, 'No Description Provided')
 		  
 		  self.build
+		  @conceptscheme.addConcept(self)
 		  
 		end
 		
@@ -46,7 +49,7 @@ module EJP
 		def build()  # fills the graph
 			guid = self.uri
 			label = self.label
-			desc = self.desc
+			desc = self.description
 			cs = self.factory.conceptscheme.uri
 			f = self.factory
 			g = self.graph

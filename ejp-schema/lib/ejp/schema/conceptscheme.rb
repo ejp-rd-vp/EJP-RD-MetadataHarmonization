@@ -29,7 +29,7 @@ module EJP
         end
         
         def addConcept(concept)
-          self.concepts << concept
+          self.concepts << concept unless self.concepts.include?(concept)
         end
         
         def build()
@@ -38,13 +38,12 @@ module EJP
           g = self.graph
           title = self.title
     			creator = self.creator
-    
+      #    $stderr.puts "#{f}\n #{g.class}\n #{guid} "
           f.add_triples(g,[
               [guid, $rdf.type, $skos.ConceptScheme],
-              [guid, $dct.title, title ],
-              [guid, $dct.creator, creator ],
-            ])
-
+          #    [guid, $dct.title, title ],
+          #    [guid, $dct.creator, creator ],
+           ])
 
           return g
         end
