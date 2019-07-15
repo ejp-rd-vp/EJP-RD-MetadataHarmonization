@@ -5,7 +5,7 @@ module EJP
   module Schema
 
   
-    class Patient < EJP::Schema::Sample
+    class Patient < EJP::Schema::BiologicalSample
         attr_accessor :id  
         attr_accessor :pseudonym
         attr_accessor :diagnosis

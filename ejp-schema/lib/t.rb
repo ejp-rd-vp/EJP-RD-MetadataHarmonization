@@ -1,5 +1,5 @@
-#$LOAD_PATH << '/home/markw/Documents/CODE/EJP-RD-MetadataHarmonization/ejp-schema/lib'
-$LOAD_PATH << '/home/osboxes/CODE/EJP-RD-MetadataHarmonization/ejp-schema/lib'
+$LOAD_PATH << '/home/markw/Documents/CODE/EJP-RD-MetadataHarmonization/ejp-schema/lib'
+#$LOAD_PATH << '/home/osboxes/CODE/EJP-RD-MetadataHarmonization/ejp-schema/lib'
 
 require 'sio_helper'
 require 'ejp/schema'

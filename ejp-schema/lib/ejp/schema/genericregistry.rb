@@ -92,8 +92,8 @@ module EJP
     
     
             def addDataset(ds)
-              unless ds.is_a? EJP::Schema::Sample
-                warn "Ignoring this dataset (#{ds.to_s}), because it is not an EJP::Schema::Sample or Patient object"
+              unless ds.is_a? EJP::Schema::BiologicalSample
+                warn "Ignoring this dataset (#{ds.to_s}), because it is not an EJP::Schema::BiologicalSample or Patient object"
               else
                 $stderr.puts "Adding dataset..."
                 @datasets << ds

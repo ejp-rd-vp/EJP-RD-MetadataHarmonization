@@ -15,7 +15,7 @@ require "ejp/schema/genericregistry"
 require "ejp/schema/patientregistry"
 require "ejp/schema/biobank"
 require "ejp/schema/studydesign"
-require "ejp/schema/sample"
+require "ejp/schema/biologicalsample"
 require "ejp/schema/patient"
 
 
@@ -41,6 +41,9 @@ module EJP
           @top_catalog = nil
           
     end
+    
+    
+    
     
     def createPatientRegistry(params)
       
@@ -71,6 +74,9 @@ module EJP
     
     
     
+    
+    
+    
     def createBioBank(params)
       if !self.top_catalog.nil?
         warn "cannot create a new top-level schema (registry or Biobank).  You must create a new factory object to do this"
@@ -94,10 +100,17 @@ module EJP
       return top
     end
 
+
+
+
     
     def createStudyDesign()
     end
     
+
+
+
+
     def createBiologicalSample(params)
       types = params.fetch(:types, ["http://semanticscience.org/resource/sample",
                                     "http://purl.obolibrary.org/obo/OBI_0000671"] ) #sample
@@ -112,13 +125,17 @@ module EJP
         uri = self.baseuri + "/BiologicalSample_" + uuid
       end
 
-      return EJP::Schema::Sample.new(params.merge(
+      return EJP::Schema::BiologicalSample.new(params.merge(
                   factory: self,
                   uri: uri,
                   types: types,
                   ))
       
     end
+    
+    
+    
+    
     
     def createPatient()
       types = params.fetch(:types, ["http://semanticscience.org/resource/patient",
@@ -144,6 +161,11 @@ module EJP
                   ))
     end
     
+    
+    
+    
+    
+    
     def createCode(params)
       return EJP::Schema::Code.new(params.merge({
                   factory: self,
@@ -151,11 +173,23 @@ module EJP
       
     end
     
+    
+    
+    
     def createCodingSystem()
     end
     
+    
+    
+    
+    
     def createPropertyValue()
     end
+    
+    
+    
+    
+    
     
     def createOrganization(params)
       return EJP::Schema::Organization.new(params.merge({
@@ -164,8 +198,16 @@ module EJP
       }))
     end
     
+    
+    
+    
+    
     def createDateTime()
     end
+    
+    
+    
+    
     
     def createLocation(params)
       return EJP::Schema::Location.new(params.merge({
@@ -174,9 +216,17 @@ module EJP
       }))
     end
     
+    
+    
+    
+    
     def createEUPID()
     end
     
+                    
+                    
+                    
+                    
                     
     def add_triples(graph, triples)
       # note that triples might be an RDF::Graph... it's fine with .each
@@ -195,6 +245,11 @@ module EJP
       end
       return graph
     end
+
+
+
+
+
 
   end
 end
