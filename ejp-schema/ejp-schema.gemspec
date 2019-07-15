@@ -5,7 +5,7 @@ require "ejp/schema/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "ejp-schema"
-  spec.version       = Ejp::Schema::VERSION
+  spec.version       = EJP::Schema::VERSION
   spec.authors       = ["Mark Wilkinson"]
   spec.email         = ["markw@illuminae.com"]
 
