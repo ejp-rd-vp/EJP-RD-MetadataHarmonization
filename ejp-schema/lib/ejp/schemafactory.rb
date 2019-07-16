@@ -11,6 +11,7 @@ require "ejp/schema/datetime"
 require "ejp/schema/location"
 require "ejp/schema/eupid"
 require "ejp/schema/conceptscheme"
+require "ejp/schema/catalog"
 require "ejp/schema/genericregistry"
 require "ejp/schema/patientregistry"
 require "ejp/schema/biobank"
@@ -25,6 +26,7 @@ module EJP
     attr_accessor :conceptscheme
     attr_accessor :helper
     attr_accessor :top_catalog
+#    attr_accessor :datasets
     
     def initialize(params = {})
           #super(params)  
@@ -45,23 +47,45 @@ module EJP
     
     
     
-    def createPatientRegistry(params)
+    def createCatalog(params)
       
       if !self.top_catalog.nil?
-        warn "cannot create a new top-level schema (registry or Biobank).  You must create a new factory object to do this"
+        warn "cannot create a new Catalog from this factory.  You must create a new factory object to do this"
         return false
       end
       
       uri = params.fetch(:uri, nil )
       unless uri
-        uri = self.baseuri + "#PatientRegistry"
+        uri = self.baseuri + "#Catalog"
       end
-      types = params.fetch(:types, [$dcat.Catalog,
-                                    "http://purl.obolibrary.org/obo/NCIT_C61393",
-                                    "http://purl.allotrope.org/ontologies/result#AFR_0001059"]
+      types = params.fetch(:types, []
                            )
       types = [types] unless types.is_a?(Array)
       (types << [$dcat.Catalog, $sio.catalog, $schema.CreativeWork, $ejp.Catalog]).flatten!
+      top = EJP::Schema::Catalog.new(params.merge(
+                  factory: self,
+                  uri: uri,
+                  types: types,
+                  conceptscheme: self.conceptscheme))
+      self.top_catalog = top
+      return top
+    end
+    
+
+
+    def createPatientRegistry(params)
+      
+      uuid = UUIDTools::UUID.timestamp_create
+
+      uri = params.fetch(:uri, nil )
+      unless uri
+        uri = self.baseuri + "#PatientRegistry_" + uuid
+      end
+      types = params.fetch(:types, ["http://purl.obolibrary.org/obo/NCIT_C61393",
+                                    "http://purl.allotrope.org/ontologies/result#AFR_0001059"]
+                           )
+      types = [types] unless types.is_a?(Array)
+      (types << [$dcat.Dataset, $sio.dataset, $schema.CreativeWork, $ejp.Dataset, $ejp.PatientRegistry]).flatten!
       top = EJP::Schema::PatientRegistry.new(params.merge(
                   factory: self,
                   uri: uri,
@@ -76,27 +100,23 @@ module EJP
     
     
     
-    
     def createBioBank(params)
-      if !self.top_catalog.nil?
-        warn "cannot create a new top-level schema (registry or Biobank).  You must create a new factory object to do this"
-        return false
-      end
+      uuid = UUIDTools::UUID.timestamp_create
       uri = params.fetch(:uri, nil )
       unless uri
-        uri = self.baseuri + "#BioBank"
+        uri = self.baseuri + "#BioBank_" + uuid
       end
       types = params.fetch(:types, ["http://purl.obolibrary.org/obo/OMIABIS_0000000",
                                     "http://edamontology.org/topic_3337"]
                      )
       types = [types] unless types.is_a?(Array)
-      (types << [$dcat.Catalog, $sio.catalog, $schema.CreativeWork, $ejp.Catalog]).flatten!
+      (types << [$dcat.Dataset, $sio.dataset, $schema.CreativeWork, $ejp.Dataset, $ejp.BioBank]).flatten!
       top =  EJP::Schema::BioBank.new(params.merge(
                   factory: self,
                   uri: uri,
                   types: types,
                   conceptscheme: self.conceptscheme))
-      self.top_catalog = top
+      
       return top
     end
 
@@ -192,9 +212,11 @@ module EJP
     
     
     def createOrganization(params)
+      uuid = UUIDTools::UUID.timestamp_create
+
       return EJP::Schema::Organization.new(params.merge({
         factory: self,
-        uri: self.baseuri + "#Organization"
+        uri: self.baseuri + "#Organization_" + uuid
       }))
     end
     
@@ -210,9 +232,11 @@ module EJP
     
     
     def createLocation(params)
+      uuid = UUIDTools::UUID.timestamp_create
+
       return EJP::Schema::Location.new(params.merge({
         factory: self,
-        uri: self.baseuri + "#Org_Location"
+        uri: self.baseuri + "#Org_Location_" + uuid
       }))
     end
     

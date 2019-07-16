@@ -5,7 +5,7 @@ require 'rdf/turtle'
 require 'uuidtools'
 require 'ejp/schemafactory'
 
-$ejp =  RDF::Vocabulary.new("http://www.ejprarediseases.org/resources/ontology#")  # set global variable for our ontology
+$ejp =  RDF::Vocabulary.new("http://purl.org/ejp-rd/vocabulary/#")  # set global variable for our ontology
 $example =  RDF::Vocabulary.new("http://www.ejprarediseases.org/resources/example/")  # set global variable for our ontology
 
 module EJP

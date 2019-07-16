@@ -34,6 +34,7 @@ module EJP
             g = self.graph
             
             f.add_triples(g, [
+                    [self.uri, $rdf.type, $schema.Place ],
                     [self.uri, $schema.streetAddress, self.street.to_s ],
                     [self.uri, $schema.addressCountry, self.country.to_s ],
                     [self.uri, $schema.addressLocality,self.city.to_s ],

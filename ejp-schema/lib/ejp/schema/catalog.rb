@@ -1,9 +1,9 @@
 
 module EJP
   module Schema
-      class GenericRegistry 
+      class Catalog
             attr_accessor :factory  # parent SchemaFactory
-            attr_reader   :uri  
+            attr_reader :uri  
             attr_accessor :alternateName # string
             attr_accessor :about # Array of Code objects
             attr_accessor :name # string
@@ -20,6 +20,8 @@ module EJP
             def initialize(params = {})
               
               @graph = RDF::Graph.new()
+              @uri = params.fetch(:uri, nil)
+              abort "can't create a Catalog without a URI" if @uri.nil?
               @factory = params.fetch(:factory, nil)
               abort "can't create a Registry without a Factory" if @factory.nil?
     
@@ -35,14 +37,17 @@ module EJP
 
     
               @uri = params.fetch(:uri)
-              abort "can't create a Registyry without a URI identifier" unless @uri.to_s =~ /^\w+\:\/\//
+              abort "can't create a Catalog without a URI identifier" unless @uri.to_s =~ /^\w+\:\/\//
               @alternateName  = params.fetch(:alternateName, [])
               @alternateName = [@alternateName] unless @alternateName.is_a? Array
               
-              @about  = params.fetch(:about, [])
-              @about = [@about] unless @about.is_a? Array
+              #@about  = params.fetch(:about, [])
+              #@about = [@about] unless @about.is_a? Array
+              #@about.each do |a|
+              #  self.addAbout(a)
+              #end
               
-              @name = params.fetch(:name, 'Unidentified Registry')
+              @name = params.fetch(:name, 'Unidentified Catalog')
               @title = params.fetch(:title, "")
               @name = @title if !@title.nil?  # title takes precedence
               
@@ -56,21 +61,18 @@ module EJP
               @datasets = params.fetch(:dataset, [])
               @datasets = [@datasets] unless @datasets.is_a? Array
               
-              @about.each do |a|
-                self.addAbout(a)
-              end
     
               if !@publisher.is_a?(EJP::Schema::Organization)
                   warn "removing organization #{@publisher} because it is not an EJP::Schema::Organization object"
                   @location = nil
               end
               
-              #datasets.each do |a|
-              #  unless a.is_a? EJP::Schema::Sample
-              #    @about.remove(a)
-              #    warn "removing #{a} from the list of datasets because it is not an EJP::Schema::Registry object"
-              #  end
-              #end
+              datasets.each do |a|
+                unless a.is_a? EJP::Schema::GenericRegistry
+                  @about.remove(a)
+                  warn "removing #{a} from the list of datasets because it is not an EJP::Schema::GenericRegistry object (or child type)"
+                end
+              end
     
               
               self.build
@@ -80,27 +82,32 @@ module EJP
     
     
     
-            def addAbout(code)
-              unless code.is_a? EJP::Schema::Code
-                warn "Ignoring this code (#{code.to_s}), because it is not an EJP::Schema::Code object"
-              else
-                @factory.conceptscheme.addConcept(code)
-              end
-            end
+            #def addAbout(code)
+            #  unless code.is_a? EJP::Schema::Code
+            #    warn "Ignoring this code (#{code.to_s}), because it is not an EJP::Schema::Code object"
+            #  else
+            #    @factory.conceptscheme.addConcept(code)
+            #  end
+            #end
             
     
     
-    
-            #def addDataset(ds)
-            #  unless ds.is_a? EJP::Schema::BiologicalSample
-            #    warn "Ignoring this dataset (#{ds.to_s}), because it is not an EJP::Schema::BiologicalSample or Patient object"
-            #  else
-            #    
-            #    @datasets << ds
-            #
-            #  end
-            #    
-            #end
+            def addRegistry(reg)
+              self.addDataset(reg)
+            end
+            def addBioBank(reg)
+              self.addDataset(reg)
+            end
+            def addDataset(ds)
+              unless ds.is_a? EJP::Schema::GenericRegistry
+                warn "Ignoring this dataset (#{ds.to_s}), because it is not an EJP::Schema::GenericRegistry or child type"
+              else
+                
+                @datasets << ds
+
+              end
+                
+            end
             
     
     
@@ -108,7 +115,7 @@ module EJP
 
             def build()
                         
-              #dataset = self
+              #catalog = self
               f = self.factory
               g = self.graph
 
@@ -139,40 +146,43 @@ module EJP
               f.add_triples(g, [[self.uri, $dct.license, self.license]]) unless self.license.nil?
               
              
-              self.about.each do |c|  # c = EJP::Schema::Code
-                f.add_triples(g, [            
-                    [self.uri, $iao['IAO_0000136'], c.uri]  # is about from IAO
-                    ])
-                f.add_triples(g, c.graph)  # merge the code graph            
-              end
+              #self.about.each do |c|  # c = EJP::Schema::Code
+              #  f.add_triples(g, [            
+              #      [self.uri, $iao['IAO_0000136'], c.uri]  # is about from IAO
+              #      ])
+              #  f.add_triples(g, c.graph)  # merge the code graph            
+              #end
     
-              if !self.publisher.nil?
-                self.publisher.build
-                f.add_triples(g, [            
-                      [self.uri, $schema.creator, self.publisher.uri]
+              if !@publisher.nil?
+                org = @publisher
+                org.build
+                f.add_triples(g, [
+                                   [self.uri, $schema.creator, org.uri],
+                                   [self.uri, $dct.publisher, org.uri]
                       ])
-                f.add_triples(g, self.publisher.graph)  # this will auto-build the location object too
+                f.add_triples(g, org.graph)  # this will auto-build the location object too
               end
               
     
-              #self.factory.conceptscheme.build # refresh
-              #csgraph = self.factory.conceptscheme.graph
-              ##binding.pry
-              #f.add_triples(g, [            
-              #      [self.uri, $dcat.themeTaxonomy, self.factory.conceptscheme.uri]
-              #      ])
-              #f.add_triples(g, csgraph)
+              self.factory.conceptscheme.build # refresh
+              csgraph = self.factory.conceptscheme.graph
+              #binding.pry
+              f.add_triples(g, [            
+                    [self.uri, $dcat.themeTaxonomy, self.factory.conceptscheme.uri]
+                    ])
+              f.add_triples(g, csgraph)
           
               
-              #self.datasets.each do |d|
-              #  d.build
-              # 
-              #  dsgraph = d.graph
-              #  f.add_triples(g, [            
-              #      [self.uri, $dcat.dataset, d.uri]
-              #  ])
-              #  f.add_triples(g, dsgraph)
-              #end
+              self.datasets.each do |d|
+                d.build
+               
+$stderr.puts "building dataset #{d.title}"
+                dsgraph = d.graph
+                f.add_triples(g, [            
+                    [self.uri, $dcat.dataset, d.uri]
+                ])
+                f.add_triples(g, dsgraph)
+              end
               
               return g
             

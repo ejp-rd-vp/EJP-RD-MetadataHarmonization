@@ -8,7 +8,7 @@ module EJP
         def initialize(params = {})
           SioHelper::General.setNamespaces()
           
-          @name = params.fetch(:name, 'Some Person')
+          @name = params.fetch(:eupid, '')
           
         end
     end
