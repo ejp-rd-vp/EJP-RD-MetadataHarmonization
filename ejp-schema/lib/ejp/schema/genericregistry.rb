@@ -141,7 +141,8 @@ module EJP
              
               self.about.each do |c|  # c = EJP::Schema::Code
                 f.add_triples(g, [            
-                    [self.uri, $iao['IAO_0000136'], c.uri]  # is about from IAO
+                    [self.uri, $iao['IAO_0000136'], c.uri],  # is about from IAO
+                    [self.uri, $dcat.theme, c.uri]  # is about from IAO
                     ])
                 f.add_triples(g, c.graph)  # merge the code graph            
               end
@@ -149,7 +150,8 @@ module EJP
               if !self.publisher.nil?
                 self.publisher.build
                 f.add_triples(g, [            
-                      [self.uri, $schema.creator, self.publisher.uri]
+                      [self.uri, $schema.creator, self.publisher.uri],
+                      [self.uri, $dct.publisher, self.publisher.uri]
                       ])
                 f.add_triples(g, self.publisher.graph)  # this will auto-build the location object too
               end

@@ -4,11 +4,22 @@ $LOAD_PATH << '/home/markw/Documents/CODE/EJP-RD-MetadataHarmonization/ejp-schem
 require 'sio_helper'
 require 'ejp/schema'
 require 'rdf/vocab'
-require 'pry'
+require 'ldp_simple'
 
-#fact = EJP::SchemaFactory.new({baseuri: 'http://thisisatest.uri/'})
-#fact = EJP::SchemaFactory.new(baseuri: 'http://thisisatest.uri/')
-factory = EJP::SchemaFactory.new()
+cli = LDP::LDPClient.new({
+        :endpoint => "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/",
+        :username => "ejp",
+        :password => "ejp"})
+
+top = cli.toplevel_container # cont is a LDPContainer object
+
+
+catalogLDP = top.add_container(:slug => "CatalogOfRegistries") 
+PolishCFLDP = catalogLDP.add_container(:slug => "PolishCF") 
+UKHDLDP = catalogLDP.add_container(:slug => "UKHD") 
+
+
+factory = EJP::SchemaFactory.new(baseuri: 'http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/')
 
 code1 = factory.createCode({uri: "http://www.orpha.net/ORDO/Orphanet_586",
                        label: "Cystic Fibrosis",
@@ -17,6 +28,7 @@ code2 = factory.createCode({uri: "http://www.orpha.net/ORDO/Orphanet_98934",
                        label: "Huntington disease-like 2",
                        description: "Huntington disease-like 2 (HDL2) is a severe neurodegenerative disorder considered part of the neuroacanthocytosis syndromes (see this term) characterized by a triad of movement, psychiatric, and cognitive abnormalities."})
 orphanet = factory.createOrganization({
+              uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/#Organization",
               name: "Catalog of Registries",
               facility: "Orphanet",
               department: "Rare Disease Platform",
@@ -27,6 +39,7 @@ orphanet = factory.createOrganization({
 $stderr.puts "Org #{orphanet.name} created"
 
 pcf = factory.createOrganization({
+              uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/PolishCF/#Organization",
               name: "Polish cystic fibrosis registry group",
               facility: "Uniwersytet Medyczny im. Karola Marcinkowskiego w Poznaniu",
               street:  "Rokietnicka 8",
@@ -36,6 +49,7 @@ pcf = factory.createOrganization({
 $stderr.puts "Org #{pcf.name} created"
 
 hun = factory.createOrganization({
+              uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/UKHD/#Organization",
               name: "UK Huntington disease registry",
               facility: "Cardiff School of Biosciences",
               street:  "Sir Martin Evans Building, Museum Avenue",
@@ -45,6 +59,7 @@ hun = factory.createOrganization({
 $stderr.puts "Org #{hun.name} created"
 
 catalog = factory.createCatalog({
+       uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/#Catalog",
        alternateName: "OrphaCoR",
        title: "Orphanet: Registries & biobanks  ",
        publisher: orphanet,
@@ -54,17 +69,22 @@ catalog = factory.createCatalog({
        })
 $stderr.puts "catalog #{catalog.title} created"
 
+
+
+
 cf_registry = factory.createPatientRegistry({
+       uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/PolishCF/#Registry",
        title: "Polish cystic fibrosis patient registry",
        about: [code1],
        publisher: pcf,
-       description: "this is a description",
-       homepage:"http://homepage.org",
-       license: "http://creativecommons.org/ccby",
+       description: "Polish cystic fibrosis patient registry",
+       homepage:"http://www.kzgm.ump.edu.pl/",
+       license: "https://creativecommons.org/licenses/by/4.0/",
        })
 $stderr.puts "Reg #{cf_registry.title} created"
 
 hun_registry = factory.createPatientRegistry({
+       uri: "http://training.fairdata.solutions/DAV/home/EJP_HACK/MarkW/CatalogOfRegistries/UKHD/#Registry",
        title: "UK Huntington disease registry",
        about: [code2],
        publisher: hun,
@@ -90,6 +110,12 @@ catalog.addDataset(hun_registry)
 $stderr.puts "dataset added"
 
 catalog.build
+
+catalogLDP.add_metadata(catalog.graph.map {|s| [s.subject,s.predicate,s.object]})
+PolishCFLDP.add_metadata(cf_registry.graph.map {|s| [s.subject,s.predicate,s.object]})
+UKHDLDP.add_metadata(hun_registry.graph.map {|s| [s.subject,s.predicate,s.object]})
+
+#
 puts catalog.graph.dump(:turtle)
 #puts catalog.graph.dump(:jsonld)
 

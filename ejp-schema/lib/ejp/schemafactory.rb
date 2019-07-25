@@ -85,14 +85,13 @@ module EJP
                                     "http://purl.allotrope.org/ontologies/result#AFR_0001059"]
                            )
       types = [types] unless types.is_a?(Array)
-      (types << [$dcat.Dataset, $sio.dataset, $schema.CreativeWork, $ejp.Dataset, $ejp.PatientRegistry]).flatten!
-      top = EJP::Schema::PatientRegistry.new(params.merge(
+      (types << [$dcat.Dataset, $sio.dataset, $schema.CreativeWork, $ejp.Dataset, $ejp.PatientRegistryDataset]).flatten!
+      reg = EJP::Schema::PatientRegistry.new(params.merge(
                   factory: self,
                   uri: uri,
                   types: types,
                   conceptscheme: self.conceptscheme))
-      self.top_catalog = top
-      return top
+      return reg
     end
     
     
@@ -111,13 +110,13 @@ module EJP
                      )
       types = [types] unless types.is_a?(Array)
       (types << [$dcat.Dataset, $sio.dataset, $schema.CreativeWork, $ejp.Dataset, $ejp.BioBank]).flatten!
-      top =  EJP::Schema::BioBank.new(params.merge(
+      bio =  EJP::Schema::BioBank.new(params.merge(
                   factory: self,
                   uri: uri,
                   types: types,
                   conceptscheme: self.conceptscheme))
       
-      return top
+      return bio
     end
 
 
@@ -213,10 +212,11 @@ module EJP
     
     def createOrganization(params)
       uuid = UUIDTools::UUID.timestamp_create
+      uri = params.fetch(:uri, self.baseuri + "#Organization_" + uuid)
 
       return EJP::Schema::Organization.new(params.merge({
         factory: self,
-        uri: self.baseuri + "#Organization_" + uuid
+        uri: uri
       }))
     end
     

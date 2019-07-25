@@ -175,8 +175,7 @@ module EJP
               
               self.datasets.each do |d|
                 d.build
-               
-$stderr.puts "building dataset #{d.title}"
+              
                 dsgraph = d.graph
                 f.add_triples(g, [            
                     [self.uri, $dcat.dataset, d.uri]
